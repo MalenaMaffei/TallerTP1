@@ -1,0 +1,1 @@
+/usr/bin/cc  -g   CMakeFiles/Mi_TP.dir/main.c.o CMakeFiles/Mi_TP.dir/server.c.o CMakeFiles/Mi_TP.dir/client.c.o CMakeFiles/Mi_TP.dir/decoder.c.o  -o Mi_TP 

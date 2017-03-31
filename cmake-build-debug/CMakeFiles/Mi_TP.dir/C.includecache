@@ -1,0 +1,54 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/male/Taller/TP1/Mi TP/client.c
+string.h
+-
+stdio.h
+-
+errno.h
+-
+stdbool.h
+-
+sys/types.h
+-
+sys/socket.h
+-
+netdb.h
+-
+unistd.h
+-
+netinet/in.h
+-
+stdlib.h
+-
+
+/home/male/Taller/TP1/Mi TP/main.c
+stdio.h
+-
+
+/home/male/Taller/TP1/Mi TP/server.c
+stdio.h
+-
+errno.h
+-
+string.h
+-
+stdlib.h
+-
+stdbool.h
+-
+sys/types.h
+-
+sys/socket.h
+-
+netdb.h
+-
+unistd.h
+-
+

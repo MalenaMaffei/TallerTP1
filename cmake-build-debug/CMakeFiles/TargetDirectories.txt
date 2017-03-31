@@ -1,0 +1,3 @@
+/home/male/Taller/TP1/Mi TP/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/male/Taller/TP1/Mi TP/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/male/Taller/TP1/Mi TP/cmake-build-debug/CMakeFiles/Mi_TP.dir
