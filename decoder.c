@@ -30,10 +30,12 @@ enum Aminoacidos {
     GLI,
     STP
 };
-size_t genetic_code[4][4][4] = {{{LYS,ASN,LYS,ASN}, {ILE,ILE,MET,ILE}, {ARG,SER,ARG,SER}, {TRE,TRE,TRE,TRE}},
+int genetic_code[4][4][4] = {{{LYS,ASN,LYS,ASN}, {ILE,ILE,MET,ILE}, {ARG,SER,ARG,SER}, {TRE,TRE,TRE,TRE}},
                                    {{STP,TIR,STP,TIR}, {LEU,FEN,LEU,FEN}, {STP,CIS,TRP,CIS}, {SER,SER,SER,SER}},
                                    {{GLU,ASP,GLU,ASP}, {VAL,VAL,VAL,VAL}, {GLI,GLI,GLI,GLI}, {ALA,ALA,ALA,ALA}},
                                    {{GLU,HIS,GLU,HIS}, {LEU,LEU,LEU,LEU}, {ARG,ARG,ARG,ARG}, {PRO,PRO,PRO,PRO}}};
+
+int amino_histogram[20] = {0};
 
 unsigned char base_code(unsigned char base){
     base |= MASK;
@@ -64,49 +66,49 @@ int find_amino(unsigned char codon){
 //    first_base |= MASK;
 //    first_base ^= MASK;
 //    printf("base 1: 0x%x\n", first_base);
-    return genetic_code[first_base][second_base][third_base];
+    int amino =  genetic_code[first_base][second_base][third_base];
+
+    amino_histogram[amino]++;
+    printf("que carajos puso uno en %i\n", amino );
+    return amino;
 }
 
 const char *amino_names[20] = {"Fenilalanina", "Leucina","Serina","Tirosina","Cisteína", "Triptófano", "Prolina", "Histidina", "Ácido glutámico", "Isoleucina",
                               "Metionina", "Treonina", "Asparagina", "Lisina", "Arginina", "Valina", "Alanina", "Ácido aspártico", "Glicina", "Stop"};
-//amino_names[0] = "Fenilalanina";
-//amino_names[1] = "Leucina";
-//amino_names[2] = "Serina";
-//amino_names[3] = "Tirosina";
-//amino_names[4] = "Cisteína";
-//amino_names[5] = "Triptófano";
-//amino_names[6] = "Prolina";
-//amino_names[7] = "Histidina";
-//amino_names[8] = "Ácido glutámico";
-//amino_names[9] = "Isoleucina";
-//amino_names[10] = "Metionina";
-//amino_names[11] = "Treonina";
-//amino_names[12] = "Asparagina";
-//amino_names[13] = "Lisina";
-//amino_names[14] = "Arginina";
-//amino_names[15] = "Valina";
-//amino_names[16] = "Alanina";
-//amino_names[17] = "Ácido aspártico";
-//amino_names[18] = "Glicina";
-//amino_names[19] = "Stop";
 
 
 
-void main(){
-    size_t amino_histogram[20] = {0};
+int main(){
 
+    int code = find_amino(0x15);
+    printf("UUU es 0: %i con nombre: %s\n", code, amino_names[code]);
 
-    printf("UUU es 0: %i con nombre: %s\n", find_amino(0x15), amino_names[find_amino(0x15)]);
-    printf("CUU es 1: %i con nombre: %s\n", find_amino(0x35), amino_names[find_amino(0x35)]);
-    printf("UCU es 2: %i con nombre: %s\n", find_amino(0x1D), amino_names[find_amino(0x1D)]);
-    printf("UCC es 2: %i con nombre: %s\n", find_amino(0x1F), amino_names[find_amino(0x1F)]);
+    code = find_amino(0x35);
+    printf("CUU es 1: %i con nombre: %s\n", code, amino_names[code]);
 
+    code = find_amino(0x1D);
+    printf("UCU es 2: %i con nombre: %s\n", code, amino_names[code]);
 
+    code = find_amino(0x1F);
+    printf("UCC es 2: %i con nombre: %s\n", code, amino_names[code]);
 
-    printf("CGU es 14: %i con nombre: %s\n", find_amino(0x39), amino_names[find_amino(0x39)]);
-    printf("GCC es 14: %i con nombre: %s\n", find_amino(0x3B), amino_names[find_amino(0x3B)]);
-    printf("AGA es 14: %i con nombre: %s\n", find_amino(0x8), amino_names[find_amino(0x8)]);
-    printf("AGG es 14: %i con nombre: %s\n", find_amino(0xA), amino_names[find_amino(0xA)]);
+    code = find_amino(0x39);
+    printf("CGU es 14: %i con nombre: %s\n", code, amino_names[code]);
+
+    code = find_amino(0x3B);
+    printf("GCC es 14: %i con nombre: %s\n", code, amino_names[code]);
+
+    code = find_amino(0x8);
+    printf("AGA es 14: %i con nombre: %s\n", code, amino_names[code]);
+
+    code = find_amino(0xA);
+    printf("AGG es 14: %i con nombre: %s\n", code, amino_names[code]);
+
+    printf("pos 0 esperado 1: %i\n", amino_histogram[0] );
+    printf("pos 1 esperado 1: %i\n", amino_histogram[1] );
+    printf("pos 2 esperado 2: %i\n", amino_histogram[2] );
+    printf("pos 14 esperado 4: %i\n", amino_histogram[14] );
+
+    return 0;
 
 }
-
