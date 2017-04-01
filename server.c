@@ -11,6 +11,7 @@
 #include <netdb.h>
 #include <unistd.h>
 #include "amino_counter.h"
+#include "decoder.h"
 #define BACKLOG 10
 
 int main(int argc, char **argv){
@@ -57,13 +58,20 @@ int main(int argc, char **argv){
     char buffer_leer[1024] = {0};
     char *buffer_ptr = buffer_leer;
     int bytes_read;
-
+    int codons_received = 0;
     while ((bytes_read = recv(new_fd, buffer_ptr, sizeof buffer_leer, 0))>0){
         printf("se leyeron: %i\n", bytes_read);
         buffer_ptr+=bytes_read;
+        codons_received += bytes_read;
     }
 
     *buffer_ptr = '\0';
+
+// TODO con el tamanio de lo que se leyo malloc para pasarle al decoder.
+
+    size_t *decoded_aminos[1024]; 
+
+
 
 
     int iterador = 0;
@@ -79,4 +87,3 @@ int main(int argc, char **argv){
 
     return 0;
 }
-
