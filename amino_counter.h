@@ -9,9 +9,9 @@
 #include <stdio.h>
 
 typedef struct {
-    size_t first;
-    size_t second;
-    size_t third;
+    int first;
+    int second;
+    int third;
     size_t amino_count;
     size_t amino_histogram[20];
 } amino_counter_t;
