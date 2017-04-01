@@ -10,6 +10,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <unistd.h>
+#include "amino_counter.h"
 #define BACKLOG 10
 
 int main(int argc, char **argv){
@@ -70,6 +71,12 @@ int main(int argc, char **argv){
         printf("posicion %i: 0x%x\n", iterador, buffer_leer[iterador]);
         ++iterador;
     }
+
+
+
+
+
+
     return 0;
 }
 

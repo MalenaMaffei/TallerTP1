@@ -9,25 +9,25 @@
 #define MASK 0xfc
 
 enum Aminoacidos {
+    ASP,
+    GLU,
+    ALA,
+    ARG,
+    ASN,
+    CIS,
     FEN,
+    GLI,
+    HIS,
+    ILE,
     LEU,
+    LYS,
+    MET,
+    PRO,
     SER,
     TIR,
-    CIS,
-    TRP,
-    PRO,
-    HIS,
-    GLU,
-    ILE,
-    MET,
     TRE,
-    ASN,
-    LYS,
-    ARG,
+    TRP,
     VAL,
-    ALA,
-    ASP,
-    GLI,
     STP
 };
 int genetic_code[4][4][4] = {{{LYS,ASN,LYS,ASN}, {ILE,ILE,MET,ILE}, {ARG,SER,ARG,SER}, {TRE,TRE,TRE,TRE}},
@@ -35,7 +35,7 @@ int genetic_code[4][4][4] = {{{LYS,ASN,LYS,ASN}, {ILE,ILE,MET,ILE}, {ARG,SER,ARG
                                    {{GLU,ASP,GLU,ASP}, {VAL,VAL,VAL,VAL}, {GLI,GLI,GLI,GLI}, {ALA,ALA,ALA,ALA}},
                                    {{GLU,HIS,GLU,HIS}, {LEU,LEU,LEU,LEU}, {ARG,ARG,ARG,ARG}, {PRO,PRO,PRO,PRO}}};
 
-int amino_histogram[20] = {0};
+size_t amino_histogram[20] = {0};
 
 unsigned char base_code(unsigned char base){
     base |= MASK;
@@ -72,7 +72,7 @@ int find_amino(unsigned char codon){
     printf("que carajos puso uno en %i\n", amino );
     return amino;
 }
-
+//TODO ORDENAR ESTO ALFABETICAMENTE
 const char *amino_names[20] = {"Fenilalanina", "Leucina","Serina","Tirosina","Cisteína", "Triptófano", "Prolina", "Histidina", "Ácido glutámico", "Isoleucina",
                               "Metionina", "Treonina", "Asparagina", "Lisina", "Arginina", "Valina", "Alanina", "Ácido aspártico", "Glicina", "Stop"};
 
@@ -108,6 +108,8 @@ int main(){
     printf("pos 1 esperado 1: %i\n", amino_histogram[1] );
     printf("pos 2 esperado 2: %i\n", amino_histogram[2] );
     printf("pos 14 esperado 4: %i\n", amino_histogram[14] );
+
+
 
     return 0;
 
