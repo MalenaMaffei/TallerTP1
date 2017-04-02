@@ -53,7 +53,7 @@ unsigned char base_code(unsigned char base){
     return base;
 }
 
-size_t find_amino(unsigned char codon){
+size_t get_amino(unsigned char codon){
     unsigned char first_base, second_base, third_base;
 
     third_base = codon;
@@ -93,31 +93,43 @@ const char* amino_name(int amino_code){
     return amino_names[amino_code];
 }
 
+void decode_buffer(unsigned char *received_buffer, size_t *destination, size_t lenght){
+    size_t amino;
+    unsigned char codon;
+    for (int i = 0; i < lenght; ++i) {
+        codon = received_buffer[i];
+        amino = get_amino(codon);
+        destination[i] = amino;
+    }
+}
+
 int main(){
 
-    int code = find_amino(0x15);
-    printf("UUU es 0: %i con nombre: %s\n", code, amino_names[code]);
 
-    code = find_amino(0x35);
-    printf("CUU es 1: %i con nombre: %s\n", code, amino_names[code]);
 
-    code = find_amino(0x1D);
-    printf("UCU es 2: %i con nombre: %s\n", code, amino_names[code]);
-
-    code = find_amino(0x1F);
-    printf("UCC es 2: %i con nombre: %s\n", code, amino_names[code]);
-
-    code = find_amino(0x39);
-    printf("CGU es 14: %i con nombre: %s\n", code, amino_names[code]);
-
-    code = find_amino(0x3B);
-    printf("GCC es 14: %i con nombre: %s\n", code, amino_names[code]);
-
-    code = find_amino(0x8);
-    printf("AGA es 14: %i con nombre: %s\n", code, amino_names[code]);
-
-    code = find_amino(0xA);
-    printf("AGG es 14: %i con nombre: %s\n", code, amino_names[code]);
+//    int code = find_amino(0x15);
+//    printf("UUU es 0: %i con nombre: %s\n", code, amino_names[code]);
+//
+//    code = find_amino(0x35);
+//    printf("CUU es 1: %i con nombre: %s\n", code, amino_names[code]);
+//
+//    code = find_amino(0x1D);
+//    printf("UCU es 2: %i con nombre: %s\n", code, amino_names[code]);
+//
+//    code = find_amino(0x1F);
+//    printf("UCC es 2: %i con nombre: %s\n", code, amino_names[code]);
+//
+//    code = find_amino(0x39);
+//    printf("CGU es 14: %i con nombre: %s\n", code, amino_names[code]);
+//
+//    code = find_amino(0x3B);
+//    printf("GCC es 14: %i con nombre: %s\n", code, amino_names[code]);
+//
+//    code = find_amino(0x8);
+//    printf("AGA es 14: %i con nombre: %s\n", code, amino_names[code]);
+//
+//    code = find_amino(0xA);
+//    printf("AGG es 14: %i con nombre: %s\n", code, amino_names[code]);
 
     return 0;
 }

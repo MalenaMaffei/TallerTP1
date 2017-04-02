@@ -1,0 +1,3 @@
+al terminar, implementar counting sort and use that for top X.
+Keep histogram generated from CS to check quantities.
+por ahora lo dejo como esta asi termino de una puta vez
