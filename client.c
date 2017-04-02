@@ -120,9 +120,9 @@ int main(int argc, char **argv){
 
     encode_codon_str(source, encoded_codons, encoded_codons_size);
 
-    for (int i = 0; i < encoded_codons_size; ++i) {
-        printf("posicion %i: 0x%x\n", i, encoded_codons[i]);
-    }
+//    for (int i = 0; i < encoded_codons_size; ++i) {
+//        printf("posicion %i: 0x%x\n", i, encoded_codons[i]);
+//    }
 
     int bytes_left, bytes_sent;
     unsigned char *buffer_ptr = encoded_codons;
@@ -132,13 +132,27 @@ int main(int argc, char **argv){
         } else {
             bytes_left-=bytes_sent;
             buffer_ptr+=bytes_sent;
-            printf("mando %d bytes\n", bytes_sent);
+//            printf("mando %d bytes\n", bytes_sent);
         }
     }
 
     shutdown(skt, 1); //puede dar error
     free(source); /* Don't forget to call free() later! */
     free(encoded_codons);
+
+    unsigned char buffer_leer[1024] = {0};
+    buffer_ptr = buffer_leer;
+    int bytes_read;
+    int codons_received = 0;
+    while ((bytes_read = recv(skt, buffer_ptr, sizeof buffer_leer, 0))>0){
+//        printf("se leyeron: %i\n", bytes_read);
+        buffer_ptr+=bytes_read;
+        codons_received += bytes_read;
+    }
+
+    *buffer_ptr = '\0';
+
+    printf("%s", buffer_leer);
 
     return 0;
 }

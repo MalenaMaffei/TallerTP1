@@ -14,6 +14,9 @@
 #include "decoder.h"
 #define BACKLOG 10
 
+//TODO poner aca todo el tema de las strings.
+//void generate_response(char *buffer)
+
 int main(int argc, char **argv){
     char *server_port = argv[1];
 //    TODO chequear cantidad correcta de argc 2 en este caso
@@ -55,12 +58,12 @@ int main(int argc, char **argv){
 
 
 //    TODO HACER UN BUFFER DINAMICO ACA TAMBIEN
-    char buffer_leer[1024] = {0};
-    char *buffer_ptr = buffer_leer;
+    unsigned char buffer_leer[1024] = {0};
+    unsigned char *buffer_ptr = buffer_leer;
     int bytes_read;
     int codons_received = 0;
     while ((bytes_read = recv(new_fd, buffer_ptr, sizeof buffer_leer, 0))>0){
-        printf("se leyeron: %i\n", bytes_read);
+//        printf("se leyeron: %i\n", bytes_read);
         buffer_ptr+=bytes_read;
         codons_received += bytes_read;
     }
@@ -69,19 +72,55 @@ int main(int argc, char **argv){
 
 // TODO con el tamanio de lo que se leyo malloc para pasarle al decoder.
 
-    size_t *decoded_aminos[1024]; 
+    size_t decoded_aminos[1024];
+
+    decode_buffer(buffer_leer, decoded_aminos, codons_received);
+    amino_counter_t counter;
+    amino_counter_create(&counter);
+    amino_counter_process(&counter, decoded_aminos, codons_received);
 
 
+//    TODO LOOP PARA IR MANDANDO SI ES QUE HAY PRIMERO SEGUNDO ETC. por ahora uso un buffer gigante y listo
+
+    char output[1024];
+    char *output_ptr = output;
+    int chars_written = 0;
+    int output_size = 0;
+    size_t amino_count = amino_counter_get_amino_count(&counter);
+    chars_written = snprintf(output_ptr, sizeof(output), "Cantidad de proteínas encontradas: %zu\n\nAminoácidos más frecuentes:\n", amino_count);
+    output_size += chars_written;
 
 
-    int iterador = 0;
-    while (buffer_leer[iterador] != '\0'){
-        printf("posicion %i: 0x%x\n", iterador, buffer_leer[iterador]);
-        ++iterador;
+    int primero = amino_counter_get_first(&counter);
+    output_ptr += chars_written;
+    chars_written = snprintf(output_ptr, sizeof(output), "1) %s: %zu\n", amino_name(primero), amino_counter_get_freq(&counter, primero));
+    output_size += chars_written;
+
+    output_ptr += chars_written;
+    int segundo = amino_counter_get_second(&counter);
+    chars_written = snprintf(output_ptr, sizeof(output), "2) %s: %zu\n", amino_name(segundo), amino_counter_get_freq(&counter, segundo));
+    output_size += chars_written;
+
+    output_ptr += chars_written;
+    int tercero = amino_counter_get_third(&counter);
+    chars_written = snprintf(output_ptr, sizeof(output), "3) %s: %zu\n", amino_name(tercero), amino_counter_get_freq(&counter, tercero));
+    output_size += chars_written;
+    ++output_size; //incluir el \0
+
+    output_ptr = output;
+    int bytes_left, bytes_sent;
+    for (bytes_left = output_size; bytes_left>0;) {
+        if ((bytes_sent=send(new_fd, output_ptr, bytes_left, 0))<=0) {
+            exit(-1);
+        } else {
+            bytes_left-=bytes_sent;
+            output_ptr+=bytes_sent;
+//            printf("mando %d bytes\n", bytes_sent);
+        }
     }
 
-
-
+    shutdown(new_fd, 1); //puede dar error
+//    printf("%s", output);
 
 
 

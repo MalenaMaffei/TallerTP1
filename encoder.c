@@ -31,7 +31,7 @@ unsigned char codon_encoder(unsigned char *codon){
         binary_codon |= current;
 //        printf("despues de OR: 0x%x\n", binary_codon);
     }
-    printf("OR final: 0x%x\n", binary_codon);
+//    printf("OR final: 0x%x\n", binary_codon);
     return binary_codon;
 }
 

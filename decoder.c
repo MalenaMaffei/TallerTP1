@@ -5,7 +5,6 @@
 #include "decoder.h"
 #include <stdio.h>
 #include <stdlib.h>
-
 #define MASK 0xfc
 
 enum Aminoacidos {
@@ -89,7 +88,7 @@ const char *amino_names[20] = {
     "Triptófano", "Valina", "Stop"
 };
 
-const char* amino_name(int amino_code){
+const char* amino_name(size_t amino_code){
     return amino_names[amino_code];
 }
 
@@ -103,33 +102,30 @@ void decode_buffer(unsigned char *received_buffer, size_t *destination, size_t l
     }
 }
 
-int main(){
-
-
-
-//    int code = find_amino(0x15);
-//    printf("UUU es 0: %i con nombre: %s\n", code, amino_names[code]);
+//int main(){
 //
-//    code = find_amino(0x35);
-//    printf("CUU es 1: %i con nombre: %s\n", code, amino_names[code]);
+//    unsigned char buffer[16] = {0x17, 0x24, 0x7, 0x10, 0x19, 0x12, 0x17, 0x7, 0x7, 0x17, 0x10, 0x19, 0x17, 0x24, 0x19, 0x10};
+//    size_t destino[16];
 //
-//    code = find_amino(0x1D);
-//    printf("UCU es 2: %i con nombre: %s\n", code, amino_names[code]);
+//    decode_buffer(buffer, destino, 16);
 //
-//    code = find_amino(0x1F);
-//    printf("UCC es 2: %i con nombre: %s\n", code, amino_names[code]);
+//    for (int i = 0; i < 16; ++i) {
+//        printf("pos %i, codigo %zu, nombre %s\n", i, destino[i], amino_name(destino[i]));
+//    }
 //
-//    code = find_amino(0x39);
-//    printf("CGU es 14: %i con nombre: %s\n", code, amino_names[code]);
+//    amino_counter_t counter;
+//    amino_counter_create(&counter);
+//    amino_counter_process(&counter, destino, 16);
 //
-//    code = find_amino(0x3B);
-//    printf("GCC es 14: %i con nombre: %s\n", code, amino_names[code]);
+//    int primero = amino_counter_get_first(&counter);
+//    printf("primero: %i con nombre %s y freq: %zu\n", primero, amino_name(primero), amino_counter_get_freq(&counter, primero));
 //
-//    code = find_amino(0x8);
-//    printf("AGA es 14: %i con nombre: %s\n", code, amino_names[code]);
+//    int segundo = amino_counter_get_second(&counter);
+//    printf("segundo: %i con nombre %s y freq: %zu\n", segundo, amino_name(segundo), amino_counter_get_freq(&counter, segundo));
 //
-//    code = find_amino(0xA);
-//    printf("AGG es 14: %i con nombre: %s\n", code, amino_names[code]);
-
-    return 0;
-}
+//    int tercero = amino_counter_get_third(&counter);
+//    printf("tercero: %i con nombre %s y freq: %zu\n", tercero, amino_name(tercero), amino_counter_get_freq(&counter, tercero));
+//
+//    printf("cantidad de aminos: %zu", amino_counter_get_amino_count(&counter));
+//    return 0;
+//}
