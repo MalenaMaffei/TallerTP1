@@ -17,6 +17,40 @@
 //TODO poner aca todo el tema de las strings.
 //void generate_response(char *buffer)
 
+
+int write_output(amino_counter_t* counter, char *output, size_t length){
+    char *output_ptr = output;
+    int chars_written = 0;
+    int output_size = 0;
+    size_t amino_count = amino_counter_get_amino_count(counter);
+    chars_written = snprintf(output_ptr, length - chars_written, "Cantidad de proteínas encontradas: %zu\n\nAminoácidos más frecuentes:\n", amino_count);
+    output_size += chars_written;
+
+//    int amino, freq;
+//    for (int i = 1; i < 4; ++i) {
+//        amino =
+//    }
+
+    int primero = amino_counter_get_first(counter);
+    output_ptr += chars_written;
+    chars_written = snprintf(output_ptr, length - chars_written, "1) %s: %zu\n", amino_name(primero), amino_counter_get_freq(counter, primero));
+    output_size += chars_written;
+
+    output_ptr += chars_written;
+    int segundo = amino_counter_get_second(counter);
+    chars_written = snprintf(output_ptr, length - chars_written, "2) %s: %zu\n", amino_name(segundo), amino_counter_get_freq(counter, segundo));
+    output_size += chars_written;
+
+    output_ptr += chars_written;
+    int tercero = amino_counter_get_third(counter);
+    chars_written = snprintf(output_ptr, length - chars_written, "3) %s: %zu\n", amino_name(tercero), amino_counter_get_freq(counter, tercero));
+    output_size += chars_written;
+    ++output_size; //incluir el \0
+
+    return output_size;
+}
+
+
 int main(int argc, char **argv){
     char *server_port = argv[1];
 //    TODO chequear cantidad correcta de argc 2 en este caso
@@ -83,31 +117,10 @@ int main(int argc, char **argv){
 //    TODO LOOP PARA IR MANDANDO SI ES QUE HAY PRIMERO SEGUNDO ETC. por ahora uso un buffer gigante y listo
 
     char output[1024];
+
+    int output_size = write_output(&counter, output, 1024);
+
     char *output_ptr = output;
-    int chars_written = 0;
-    int output_size = 0;
-    size_t amino_count = amino_counter_get_amino_count(&counter);
-    chars_written = snprintf(output_ptr, sizeof(output), "Cantidad de proteínas encontradas: %zu\n\nAminoácidos más frecuentes:\n", amino_count);
-    output_size += chars_written;
-
-
-    int primero = amino_counter_get_first(&counter);
-    output_ptr += chars_written;
-    chars_written = snprintf(output_ptr, sizeof(output), "1) %s: %zu\n", amino_name(primero), amino_counter_get_freq(&counter, primero));
-    output_size += chars_written;
-
-    output_ptr += chars_written;
-    int segundo = amino_counter_get_second(&counter);
-    chars_written = snprintf(output_ptr, sizeof(output), "2) %s: %zu\n", amino_name(segundo), amino_counter_get_freq(&counter, segundo));
-    output_size += chars_written;
-
-    output_ptr += chars_written;
-    int tercero = amino_counter_get_third(&counter);
-    chars_written = snprintf(output_ptr, sizeof(output), "3) %s: %zu\n", amino_name(tercero), amino_counter_get_freq(&counter, tercero));
-    output_size += chars_written;
-    ++output_size; //incluir el \0
-
-    output_ptr = output;
     int bytes_left, bytes_sent;
     for (bytes_left = output_size; bytes_left>0;) {
         if ((bytes_sent=send(new_fd, output_ptr, bytes_left, 0))<=0) {

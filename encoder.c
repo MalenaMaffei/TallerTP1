@@ -22,16 +22,12 @@ unsigned char codon_encoder(unsigned char *codon){
             default:
                 exit(0);
         }
-//        printf("\ndespues de resta: 0x%x\n", current);
 
         current <<= shift;
-//        printf("despues de shift: 0x%x\n", current);
         shift -= 2;
 
         binary_codon |= current;
-//        printf("despues de OR: 0x%x\n", binary_codon);
     }
-//    printf("OR final: 0x%x\n", binary_codon);
     return binary_codon;
 }
 

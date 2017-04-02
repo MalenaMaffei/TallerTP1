@@ -24,8 +24,5 @@ size_t amino_counter_get_amino_count(amino_counter_t *self);
 void amino_counter_process(amino_counter_t *self, size_t *amino, size_t length);
 size_t amino_counter_get_freq(amino_counter_t *self, size_t amino_code);
 
-
-
-
-
 #endif //__AMINO_COUNTER_H__
+

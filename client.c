@@ -4,24 +4,13 @@
 
 /****************** CLIENT CODE ****************/
 #define _POSIX_C_SOURCE 200112L
-/*
-   Includes clasicos de C
-*/
+
 #include <string.h>
 #include <stdio.h>
-#include <errno.h>
-#include <stdbool.h>
-/*
-   Includes mas propios de la familia *nix.
-   Funciones como socket, connect, close son propias del
-   sistema operativo.
-*/
-#include <sys/types.h>
+
 #include <sys/socket.h>
 #include <netdb.h>
-#include <unistd.h>
 
-#include <netinet/in.h>
 #include <stdlib.h>
 #include "encoder.h"
 #include "socket.h"
@@ -33,7 +22,6 @@ int main(int argc, char **argv){
 
 //    TODO chequear cantidad correcta de argc 4 en este caso
 
-
     int status;
     struct addrinfo hints;
     struct addrinfo *res;  // will point to the results
@@ -43,50 +31,14 @@ int main(int argc, char **argv){
     hints.ai_socktype = SOCK_STREAM; // TCP stream sockets
     hints.ai_flags = 0;
 
-// get ready to connect
+
     status = getaddrinfo(server_ip, server_port, &hints, &res);
-    if (status < 0){
-        exit(0);
-    }
-// servinfo now points to a linked list of 1 or more struct addrinfos
-
-// etc.
-
-// [again, you should do error-checking on getaddrinfo(), and walk
-// the "res" linked list looking for valid entries instead of just
-// assuming the first one is good (like many of these examples do.)
-// See the section on client/server for real examples.]
+    if (status < 0) { return 0; }
 
 
     socket_t client_socket;
-    int result = socket_create(&client_socket, res);
-    printf("crear socket: %i", result);
-
-//    int s = 0;
-//    bool is_connected = false;
-//
-//    struct addrinfo *ptr;
-//
-//    int skt = 0;
-
-
-//    for (ptr = res; ptr != NULL && is_connected == false; ptr = ptr->ai_next) {
-//        /* Creamos el socket definiendo la familia (deberia ser AF_INET IPv4),
-//           el tipo de socket (deberia ser SOCK_STREAM TCP) y el protocolo (0) */
-//        skt = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
-//        if (skt == -1) {
-//            printf("Error: %s\n", strerror(errno));
-//        } else {
-//            /* ai_addr encapsula la IP y el puerto del server.
-//               La estructura es automaticamente creada por getaddrinfo */
-//            s = connect(skt, ptr->ai_addr, ptr->ai_addrlen);
-//            if (s == -1) {
-//                printf("Error: %s\n", strerror(errno));
-//                close(skt);
-//            }
-//            is_connected = (s != -1); // nos conectamos?
-//        }
-//    }
+    status = socket_create_and_connect(&client_socket, res);
+    if (status < 0) { return 0; }
 
     /*---- Read the message from the server into the buffer ----*/
     freeaddrinfo(res);
@@ -128,39 +80,18 @@ int main(int argc, char **argv){
 
     socket_send(&client_socket, encoded_codons, encoded_codons_size);
 
-//    int bytes_left, bytes_sent;
-//    unsigned char *buffer_ptr = encoded_codons;
-//    for (bytes_left = encoded_codons_size; bytes_left>0;) {
-//        if ((bytes_sent=send(skt, buffer_ptr, bytes_left, 0))<=0) {
-//            exit(-1);
-//        } else {
-//            bytes_left-=bytes_sent;
-//            buffer_ptr+=bytes_sent;
-//           printf("mando %d bytes\n", bytes_sent);
-//        }
-//    }
-
-
-//    shutdown(skt, 1); //puede dar error
-    socket_shutdown(&client_socket, 1);
+    status = socket_shutdown(&client_socket, 1);
+    if (status < 0) { return 0; }
+    
     free(source); /* Don't forget to call free() later! */
     free(encoded_codons);
 
     unsigned char buffer_leer[1024] = {0};
     socket_receive(&client_socket, buffer_leer);
-//    buffer_ptr = buffer_leer;
-//    int bytes_read;
-//    int codons_received = 0;
-//    while ((bytes_read = recv(skt, buffer_ptr, sizeof buffer_leer, 0))>0){
-////        printf("se leyeron: %i\n", bytes_read);
-//        buffer_ptr+=bytes_read;
-//        codons_received += bytes_read;
-//    }
-
-//    *buffer_ptr = '\0';
 
     printf("%s", buffer_leer);
 
+    socket_destroy(&client_socket);
     return 0;
 }
 

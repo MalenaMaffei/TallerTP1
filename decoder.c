@@ -58,27 +58,18 @@ size_t get_amino(unsigned char codon){
     third_base = codon;
     third_base >>= 0;
     third_base = base_code(third_base);
-//    third_base |= MASK;
-//    third_base ^= MASK;
-//    printf("base 3: 0x%x\n", third_base);
 
     second_base = codon;
     second_base >>= 2;
     second_base = base_code(second_base);
-//    second_base |= MASK;
-//    second_base ^= MASK;
-//    printf("base 2: 0x%x\n", second_base);
+
 
     first_base = codon;
     first_base >>= 4;
     first_base = base_code(first_base);
-//    first_base |= MASK;
-//    first_base ^= MASK;
-//    printf("base 1: 0x%x\n", first_base);
+
     size_t amino =  genetic_code[first_base][second_base][third_base];
 
-    // amino_histogram[amino]++;
-    // printf("que carajos puso uno en %i\n", amino );
     return amino;
 }
 const char *amino_names[20] = {
@@ -102,30 +93,3 @@ void decode_buffer(unsigned char *received_buffer, size_t *destination, size_t l
     }
 }
 
-//int main(){
-//
-//    unsigned char buffer[16] = {0x17, 0x24, 0x7, 0x10, 0x19, 0x12, 0x17, 0x7, 0x7, 0x17, 0x10, 0x19, 0x17, 0x24, 0x19, 0x10};
-//    size_t destino[16];
-//
-//    decode_buffer(buffer, destino, 16);
-//
-//    for (int i = 0; i < 16; ++i) {
-//        printf("pos %i, codigo %zu, nombre %s\n", i, destino[i], amino_name(destino[i]));
-//    }
-//
-//    amino_counter_t counter;
-//    amino_counter_create(&counter);
-//    amino_counter_process(&counter, destino, 16);
-//
-//    int primero = amino_counter_get_first(&counter);
-//    printf("primero: %i con nombre %s y freq: %zu\n", primero, amino_name(primero), amino_counter_get_freq(&counter, primero));
-//
-//    int segundo = amino_counter_get_second(&counter);
-//    printf("segundo: %i con nombre %s y freq: %zu\n", segundo, amino_name(segundo), amino_counter_get_freq(&counter, segundo));
-//
-//    int tercero = amino_counter_get_third(&counter);
-//    printf("tercero: %i con nombre %s y freq: %zu\n", tercero, amino_name(tercero), amino_counter_get_freq(&counter, tercero));
-//
-//    printf("cantidad de aminos: %zu", amino_counter_get_amino_count(&counter));
-//    return 0;
-//}
