@@ -68,7 +68,7 @@ int main(int argc, char **argv){
         codons_received += bytes_read;
     }
 
-    *buffer_ptr = '\0';
+//    *buffer_ptr = '\0';
 
 // TODO con el tamanio de lo que se leyo malloc para pasarle al decoder.
 

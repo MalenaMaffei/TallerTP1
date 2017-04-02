@@ -24,6 +24,7 @@
 #include <netinet/in.h>
 #include <stdlib.h>
 #include "encoder.h"
+#include "socket.h"
 
 int main(int argc, char **argv){
     char *server_ip = argv[1];
@@ -56,31 +57,36 @@ int main(int argc, char **argv){
 // assuming the first one is good (like many of these examples do.)
 // See the section on client/server for real examples.]
 
-    int s = 0;
-    bool is_connected = false;
 
-    struct addrinfo *ptr;
+    socket_t client_socket;
+    int result = socket_create(&client_socket, res);
+    printf("crear socket: %i", result);
 
-    int skt = 0;
+//    int s = 0;
+//    bool is_connected = false;
+//
+//    struct addrinfo *ptr;
+//
+//    int skt = 0;
 
-    for (ptr = res; ptr != NULL && is_connected == false; ptr = ptr->ai_next) {
-        /* Creamos el socket definiendo la familia (deberia ser AF_INET IPv4),
-           el tipo de socket (deberia ser SOCK_STREAM TCP) y el protocolo (0) */
-        skt = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
-        if (skt == -1) {
-            printf("Error: %s\n", strerror(errno));
-        } else {
-            /* Nos conectamos a la fiuba
-               ai_addr encapsula la IP y el puerto del server.
-               La estructura es automaticamente creada por getaddrinfo */
-            s = connect(skt, ptr->ai_addr, ptr->ai_addrlen);
-            if (s == -1) {
-                printf("Error: %s\n", strerror(errno));
-                close(skt);
-            }
-            is_connected = (s != -1); // nos conectamos?
-        }
-    }
+
+//    for (ptr = res; ptr != NULL && is_connected == false; ptr = ptr->ai_next) {
+//        /* Creamos el socket definiendo la familia (deberia ser AF_INET IPv4),
+//           el tipo de socket (deberia ser SOCK_STREAM TCP) y el protocolo (0) */
+//        skt = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
+//        if (skt == -1) {
+//            printf("Error: %s\n", strerror(errno));
+//        } else {
+//            /* ai_addr encapsula la IP y el puerto del server.
+//               La estructura es automaticamente creada por getaddrinfo */
+//            s = connect(skt, ptr->ai_addr, ptr->ai_addrlen);
+//            if (s == -1) {
+//                printf("Error: %s\n", strerror(errno));
+//                close(skt);
+//            }
+//            is_connected = (s != -1); // nos conectamos?
+//        }
+//    }
 
     /*---- Read the message from the server into the buffer ----*/
     freeaddrinfo(res);
@@ -120,37 +126,38 @@ int main(int argc, char **argv){
 
     encode_codon_str(source, encoded_codons, encoded_codons_size);
 
-//    for (int i = 0; i < encoded_codons_size; ++i) {
-//        printf("posicion %i: 0x%x\n", i, encoded_codons[i]);
+    socket_send(&client_socket, encoded_codons, encoded_codons_size);
+
+//    int bytes_left, bytes_sent;
+//    unsigned char *buffer_ptr = encoded_codons;
+//    for (bytes_left = encoded_codons_size; bytes_left>0;) {
+//        if ((bytes_sent=send(skt, buffer_ptr, bytes_left, 0))<=0) {
+//            exit(-1);
+//        } else {
+//            bytes_left-=bytes_sent;
+//            buffer_ptr+=bytes_sent;
+//           printf("mando %d bytes\n", bytes_sent);
+//        }
 //    }
 
-    int bytes_left, bytes_sent;
-    unsigned char *buffer_ptr = encoded_codons;
-    for (bytes_left = encoded_codons_size; bytes_left>0;) {
-        if ((bytes_sent=send(skt, buffer_ptr, bytes_left, 0))<=0) {
-            exit(-1);
-        } else {
-            bytes_left-=bytes_sent;
-            buffer_ptr+=bytes_sent;
-//            printf("mando %d bytes\n", bytes_sent);
-        }
-    }
 
-    shutdown(skt, 1); //puede dar error
+//    shutdown(skt, 1); //puede dar error
+    socket_shutdown(&client_socket, 1);
     free(source); /* Don't forget to call free() later! */
     free(encoded_codons);
 
     unsigned char buffer_leer[1024] = {0};
-    buffer_ptr = buffer_leer;
-    int bytes_read;
-    int codons_received = 0;
-    while ((bytes_read = recv(skt, buffer_ptr, sizeof buffer_leer, 0))>0){
-//        printf("se leyeron: %i\n", bytes_read);
-        buffer_ptr+=bytes_read;
-        codons_received += bytes_read;
-    }
+    socket_receive(&client_socket, buffer_leer);
+//    buffer_ptr = buffer_leer;
+//    int bytes_read;
+//    int codons_received = 0;
+//    while ((bytes_read = recv(skt, buffer_ptr, sizeof buffer_leer, 0))>0){
+////        printf("se leyeron: %i\n", bytes_read);
+//        buffer_ptr+=bytes_read;
+//        codons_received += bytes_read;
+//    }
 
-    *buffer_ptr = '\0';
+//    *buffer_ptr = '\0';
 
     printf("%s", buffer_leer);
 
