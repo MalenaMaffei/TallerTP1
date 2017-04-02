@@ -12,6 +12,7 @@
 #include <unistd.h>
 #include "amino_counter.h"
 #include "decoder.h"
+#include "socket.h"
 #define BACKLOG 10
 
 //TODO poner aca todo el tema de las strings.
@@ -55,13 +56,11 @@ int main(int argc, char **argv){
     char *server_port = argv[1];
 //    TODO chequear cantidad correcta de argc 2 en este caso
 
-
-
     struct sockaddr_storage their_addr;
     socklen_t addr_size;
     struct addrinfo hints;
     struct addrinfo *res;
-    int sockfd, new_fd;
+    int new_fd;
     int status;
     // !! don't forget your error checking for these calls !!
 
@@ -79,14 +78,18 @@ int main(int argc, char **argv){
     }
     // make a socket, bind it, and listen on it:
 
-    sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-    bind(sockfd, res->ai_addr, res->ai_addrlen);
-    listen(sockfd, BACKLOG);
+
+    socket_t server_socket;
+    socket_create(&server_socket, res);
+    socket_bind_and_listen(&server_socket, res, BACKLOG);
+    // sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+    // bind(sockfd, res->ai_addr, res->ai_addrlen);
+    // listen(sockfd, BACKLOG);
 
     // now accept an incoming connection:
 
     addr_size = sizeof their_addr;
-    new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &addr_size);
+    new_fd = accept(server_socket.fD, (struct sockaddr *)&their_addr, &addr_size);
     freeaddrinfo(res);
     /*---- Send message to the socket of the incoming connection ----*/
 

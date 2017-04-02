@@ -47,7 +47,7 @@ int main(int argc, char **argv){
 
     unsigned char *source = NULL;
     FILE *fp = fopen(file_name, "r");
-    long bufsize;
+    long bufsize = 0;
     if (fp != NULL) {
         /* Go to the end of the file. */
         if (fseek(fp, 0L, SEEK_END) == 0) {
@@ -82,7 +82,7 @@ int main(int argc, char **argv){
 
     status = socket_shutdown(&client_socket, 1);
     if (status < 0) { return 0; }
-    
+
     free(source); /* Don't forget to call free() later! */
     free(encoded_codons);
 
@@ -94,4 +94,3 @@ int main(int argc, char **argv){
     socket_destroy(&client_socket);
     return 0;
 }
-

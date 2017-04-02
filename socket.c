@@ -71,6 +71,16 @@ int socket_send(socket_t* self, unsigned char *source, size_t length){
     return 0;
 }
 
+int socket_bind_and_listen(socket_t* self, struct addrinfo* res, int backlog){
+    bind(self->fD, res->ai_addr, res->ai_addrlen);
+    listen(self->fD, backlog);
+    return 0;
+}
+// TODO terminar accept
+// int socket_accept(socket_t* self, ){
+//     int new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &addr_size);
+//     return new_fd;
+// }
 int socket_receive(socket_t* self, unsigned char *buffer){
 //    TODO CHEQUEAR ERROR Y SACAR PARTE DE LEER HASTA 0
     unsigned char *buffer_ptr = buffer;
