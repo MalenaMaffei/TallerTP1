@@ -12,7 +12,9 @@
 #include "socket.h"
 #include "server.h"
 #include <unistd.h>
+
 #define BACKLOG 10
+#define BUFFSIZE 300
 
 int write_output(amino_counter_t* counter, char *output, size_t size){
     char *ptr = output;
@@ -84,24 +86,35 @@ void server(const char *server_port){
     /*---- Send message to the socket of the incoming connection ----*/
 
 
-//    TODO HACER UN BUFFER DINAMICO ACA TAMBIEN
     unsigned char buffer_leer[2024] = {0};
     unsigned char *buffer_ptr = buffer_leer;
+    size_t decoded_aminos[1024];
+    amino_counter_t counter;
+
     int bytes_read;
     int codons_received = 0;
     while ((bytes_read = recv(new_fd, buffer_ptr, sizeof buffer_leer, 0))>0){
-//        printf("se leyeron: %i\n", bytes_read);
         buffer_ptr+=bytes_read;
         codons_received += bytes_read;
     }
 
 
-    size_t decoded_aminos[1024];
-
     decode_buffer(buffer_leer, decoded_aminos, codons_received);
-    amino_counter_t counter;
     amino_counter_create(&counter);
     amino_counter_process(&counter, decoded_aminos, codons_received);
+
+//     int bytes_read;
+//     int codons_received = 0;
+//     while ((bytes_read = recv(new_fd, buffer_ptr, sizeof buffer_leer, 0))>0){
+// //        printf("se leyeron: %i\n", bytes_read);
+//         buffer_ptr+=bytes_read;
+//         codons_received += bytes_read;
+//     }
+//
+//
+//     decode_buffer(buffer_leer, decoded_aminos, codons_received);
+//     amino_counter_create(&counter);
+//     amino_counter_process(&counter, decoded_aminos, codons_received);
 
 
     char output[1024];
