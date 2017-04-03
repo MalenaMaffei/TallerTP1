@@ -73,7 +73,7 @@ size_t get_amino(unsigned char codon){
     return amino;
 }
 const char *amino_names[20] = {
-    "Ácido glutámico", "Ácido aspártico", "Alanina","Arginina", "Asparagina",
+    "Ácido aspártico", "Ácido glutámico",  "Alanina","Arginina", "Asparagina",
     "Cisteína", "Fenilalanina", "Glicina", "Histidina", "Isoleucina", "Leucina",
     "Lisina", "Metionina", "Prolina", "Serina", "Tirosina", "Treonina",
     "Triptófano", "Valina", "Stop"
