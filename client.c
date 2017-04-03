@@ -14,14 +14,13 @@
 #include <stdlib.h>
 #include "encoder.h"
 #include "socket.h"
+#include "client.h"
+//int main(int argc, char **argv){
+//    char *ip = argv[1];
+//    char *port = argv[2];
+//    char *file = argv[3];
 
-int main(int argc, char **argv){
-    char *server_ip = argv[1];
-    char *server_port = argv[2];
-    char *file_name = argv[3];
-
-//    TODO chequear cantidad correcta de argc 4 en este caso
-
+void client(const char *ip, const char *port, const char *file){
     int status;
     struct addrinfo hints;
     struct addrinfo *res;  // will point to the results
@@ -32,13 +31,13 @@ int main(int argc, char **argv){
     hints.ai_flags = 0;
 
 
-    status = getaddrinfo(server_ip, server_port, &hints, &res);
-    if (status < 0) { return 0; }
+    status = getaddrinfo(ip, port, &hints, &res);
+    if (status < 0) { exit(0); }
 
 
     socket_t client_socket;
     status = socket_create_and_connect(&client_socket, res);
-    if (status < 0) { return 0; }
+    if (status < 0) { exit(0); }
 
     /*---- Read the message from the server into the buffer ----*/
     freeaddrinfo(res);
@@ -46,7 +45,7 @@ int main(int argc, char **argv){
     //TODO NULL TERMINATOR NO LO VOY A NECESITAR
 
     unsigned char *source = NULL;
-    FILE *fp = fopen(file_name, "r");
+    FILE *fp = fopen(file, "r");
     long bufsize = 0;
     if (fp != NULL) {
         /* Go to the end of the file. */
@@ -71,17 +70,18 @@ int main(int argc, char **argv){
         }
         fclose(fp);
     }
+//    printf("source %s", source);
     size_t encoded_codons_size = bufsize/3;
     unsigned char *encoded_codons = NULL;
 
     encoded_codons = malloc(sizeof(char) * (encoded_codons_size));
 
-    encode_codon_str(source, encoded_codons, encoded_codons_size);
+    encode_str(source, encoded_codons, encoded_codons_size);
 
     socket_send(&client_socket, encoded_codons, encoded_codons_size);
 
     status = socket_shutdown(&client_socket, 1);
-    if (status < 0) { return 0; }
+    if (status < 0) { exit(0); }
 
     free(source); /* Don't forget to call free() later! */
     free(encoded_codons);
@@ -92,5 +92,5 @@ int main(int argc, char **argv){
     printf("%s", buffer_leer);
 
     socket_destroy(&client_socket);
-    return 0;
+    exit(0);
 }

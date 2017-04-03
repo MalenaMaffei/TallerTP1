@@ -11,3 +11,6 @@ echo ""
 echo "CPP LINT"
 echo ""
 python ./cpplint.py --filter=`cat filter_options` server.c decoder.c amino_counter.c decoder.h amino_counter.h
+
+printf "\n------------------MAin: ------------------\n"
+python ./cpplint.py --filter=`cat filter_options` main.c

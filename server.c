@@ -1,61 +1,55 @@
 #define _POSIX_C_SOURCE 200112L
 
 #include <stdio.h>
-#include <errno.h>
 #include <string.h>
 #include <stdlib.h>
-#include <stdbool.h>
 
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
-#include <unistd.h>
 #include "amino_counter.h"
 #include "decoder.h"
 #include "socket.h"
+#include "server.h"
+#include <unistd.h>
 #define BACKLOG 10
 
-//TODO poner aca todo el tema de las strings.
-//void generate_response(char *buffer)
-
-
-int write_output(amino_counter_t* counter, char *output, size_t length){
-    char *output_ptr = output;
-    int chars_written = 0;
+int write_output(amino_counter_t* counter, char *output, size_t size){
+    char *ptr = output;
+    int written = 0;
     int output_size = 0;
-    size_t amino_count = amino_counter_get_amino_count(counter);
-    chars_written = snprintf(output_ptr, length - chars_written, "Cantidad de proteínas encontradas: %zu\n\nAminoácidos más frecuentes:\n", amino_count);
-    output_size += chars_written;
 
-//    int amino, freq;
-//    for (int i = 1; i < 4; ++i) {
-//        amino =
-//    }
+    const char *prots = "Cantidad de proteínas encontradas: ";
+    const char *aminos = "\n\nAminoácidos más frecuentes:\n";
 
-    int primero = amino_counter_get_first(counter);
-    output_ptr += chars_written;
-    chars_written = snprintf(output_ptr, length - chars_written, "1) %s: %zu\n", amino_name(primero), amino_counter_get_freq(counter, primero));
-    output_size += chars_written;
+    size_t amino_cnt = amino_counter_get_amino_count(counter);
+    written = snprintf(ptr, size - written, "%s%zu", prots,amino_cnt);
+    output_size += written;
+    ptr += written;
 
-    output_ptr += chars_written;
-    int segundo = amino_counter_get_second(counter);
-    chars_written = snprintf(output_ptr, length - chars_written, "2) %s: %zu\n", amino_name(segundo), amino_counter_get_freq(counter, segundo));
-    output_size += chars_written;
+    written =  snprintf(ptr, size - written, "%s", aminos);
+    output_size += written;
+    ptr += written;
 
-    output_ptr += chars_written;
-    int tercero = amino_counter_get_third(counter);
-    chars_written = snprintf(output_ptr, length - chars_written, "3) %s: %zu\n", amino_name(tercero), amino_counter_get_freq(counter, tercero));
-    output_size += chars_written;
-    ++output_size; //incluir el \0
+    int amino, freq;
+    const char *name;
+    for (int i = 1; i < 4; ++i) {
+        amino = amino_counter_get_rank(counter, i);
+        freq = amino_counter_get_freq(counter, amino);
+        name = amino_name(amino);
+        if (freq == 0){continue;}
+        written = snprintf(ptr, size - written, "%i) %s: %i\n", i, name, freq);
+        output_size += written;
+        ptr += written;
+    }
 
     return output_size;
 }
 
 
-int main(int argc, char **argv){
-    char *server_port = argv[1];
-//    TODO chequear cantidad correcta de argc 2 en este caso
-
+//int main(int argc, char **argv){
+//    char *server_port = argv[1];
+void server(const char *server_port){
     struct sockaddr_storage their_addr;
     socklen_t addr_size;
     struct addrinfo hints;
@@ -74,14 +68,14 @@ int main(int argc, char **argv){
     status = getaddrinfo(0, server_port, &hints, &res);
     if (status != 0) {
         printf("Error in getaddrinfo: %s\n", gai_strerror(status));
-        return 1;
+        exit(0);
     }
     // make a socket, bind it, and listen on it:
 
 
-    socket_t server_socket;
-    socket_create(&server_socket, res);
-    socket_bind_and_listen(&server_socket, res, BACKLOG);
+    socket_t socket;
+    socket_create(&socket, res);
+    socket_bind_and_listen(&socket, res, BACKLOG);
     // sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
     // bind(sockfd, res->ai_addr, res->ai_addrlen);
     // listen(sockfd, BACKLOG);
@@ -89,7 +83,7 @@ int main(int argc, char **argv){
     // now accept an incoming connection:
 
     addr_size = sizeof their_addr;
-    new_fd = accept(server_socket.fD, (struct sockaddr *)&their_addr, &addr_size);
+    new_fd = accept(socket.fD, (struct sockaddr *)&their_addr, &addr_size);
     freeaddrinfo(res);
     /*---- Send message to the socket of the incoming connection ----*/
 
@@ -105,8 +99,6 @@ int main(int argc, char **argv){
         codons_received += bytes_read;
     }
 
-//    *buffer_ptr = '\0';
-
 // TODO con el tamanio de lo que se leyo malloc para pasarle al decoder.
 
     size_t decoded_aminos[1024];
@@ -116,8 +108,6 @@ int main(int argc, char **argv){
     amino_counter_create(&counter);
     amino_counter_process(&counter, decoded_aminos, codons_received);
 
-
-//    TODO LOOP PARA IR MANDANDO SI ES QUE HAY PRIMERO SEGUNDO ETC. por ahora uso un buffer gigante y listo
 
     char output[1024];
 
@@ -131,14 +121,13 @@ int main(int argc, char **argv){
         } else {
             bytes_left-=bytes_sent;
             output_ptr+=bytes_sent;
-//            printf("mando %d bytes\n", bytes_sent);
         }
     }
 
     shutdown(new_fd, 1); //puede dar error
-//    printf("%s", output);
 
+    close(new_fd);
+    socket_destroy(&socket);
 
-
-    return 0;
+    exit(0);
 }

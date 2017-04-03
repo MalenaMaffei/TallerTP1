@@ -83,13 +83,13 @@ const char* amino_name(size_t amino_code){
     return amino_names[amino_code];
 }
 
-void decode_buffer(unsigned char *received_buffer, size_t *destination, size_t lenght){
+void decode_buffer(unsigned char *buffer, size_t *dest, size_t lenght){
     size_t amino;
     unsigned char codon;
     for (int i = 0; i < lenght; ++i) {
-        codon = received_buffer[i];
+        codon = buffer[i];
         amino = get_amino(codon);
-        destination[i] = amino;
+        dest[i] = amino;
     }
 }
 
