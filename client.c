@@ -15,6 +15,9 @@
 #include "encoder.h"
 #include "socket.h"
 #include "client.h"
+
+#define R_BUFFSIZE 300
+#define E_BUFFSIZE 100
 //int main(int argc, char **argv){
 //    char *ip = argv[1];
 //    char *port = argv[2];
@@ -44,47 +47,63 @@ void client(const char *ip, const char *port, const char *file){
 
     //TODO NULL TERMINATOR NO LO VOY A NECESITAR
 
-    unsigned char *source = NULL;
+    unsigned char source[R_BUFFSIZE];
     FILE *fp = fopen(file, "r");
-    long bufsize = 0;
+    long file_size = 0;
     if (fp != NULL) {
         /* Go to the end of the file. */
         if (fseek(fp, 0L, SEEK_END) == 0) {
             /* Get the size of the file. */
-            bufsize = ftell(fp);
-            if (bufsize == -1) { /* Error */ }
-
-            /* Allocate our buffer to that size. */
-            source = malloc(sizeof(char) * (bufsize + 1));
-
+            file_size = ftell(fp);
+            if (file_size == -1) { /* Error */ }
+//
+//            /* Allocate our buffer to that size. */
+//            source = malloc(sizeof(char) * (bufsize + 1));
+//
             /* Go back to the start of the file. */
             if (fseek(fp, 0L, SEEK_SET) != 0) { /* Error */ }
-
-            /* Read the entire file into memory. */
-            size_t newLen = fread(source, sizeof(char), bufsize, fp);
-            if (ferror(fp) != 0) {
-                fputs("Error reading file", stderr);
-            } else {
-                source[newLen++] = '\0';
-            }
+//
+//            /* Read the entire file into memory. */
+//            size_t newLen = fread(source, sizeof(char), bufsize, fp);
+//            if (ferror(fp) != 0) {
+//                fputs("Error reading file", stderr);
+//            } else {
+//                source[newLen++] = '\0';
+//            }
         }
-        fclose(fp);
+//        fclose(fp);
     }
-//    printf("source %s", source);
-    size_t encoded_codons_size = bufsize/3;
-    unsigned char *encoded_codons = NULL;
+    unsigned char encoded_codons[E_BUFFSIZE];
 
-    encoded_codons = malloc(sizeof(char) * (encoded_codons_size));
+    while ( file_size > 0){
+        size_t block;
+        if (file_size < 300){
+            block = file_size;
+        } else {
+            block = R_BUFFSIZE;
+        }
+        if (fread(source, sizeof(char), block, fp) != block){exit(0);};
+        size_t codons_size = block/3;
+        encode_str(source, encoded_codons, codons_size);
+        socket_send(&client_socket, encoded_codons, codons_size);
+        file_size -= block;
+    }
 
-    encode_str(source, encoded_codons, encoded_codons_size);
 
-    socket_send(&client_socket, encoded_codons, encoded_codons_size);
+//    size_t codons_size = BUFFSIZE/3;
+//    unsigned char *encoded_codons = NULL;
+
+//    encoded_codons = malloc(sizeof(char) * (codons_size));
+
+//    encode_str(source, encoded_codons, codons_size);
+
+//    socket_send(&client_socket, encoded_codons, codons_size);
 
     status = socket_shutdown(&client_socket, 1);
     if (status < 0) { exit(0); }
 
-    free(source); /* Don't forget to call free() later! */
-    free(encoded_codons);
+//    free(source); /* Don't forget to call free() later! */
+//    free(encoded_codons);
 
     unsigned char buffer_leer[1024] = {0};
     socket_receive(&client_socket, buffer_leer);

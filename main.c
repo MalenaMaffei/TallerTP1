@@ -4,6 +4,7 @@
 #include "server.h"
 #include "client.h"
 int main(int argc, char **argv) {
+    if (argc < 2){ exit(0);}
     const char *mode = argv[1];
 
     const char* server_mode = "server";
