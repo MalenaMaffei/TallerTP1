@@ -32,8 +32,6 @@ unsigned char codon_encoder(unsigned char *codon){
 }
 
 void encode_str(unsigned char *src, unsigned char *dest, size_t dest_size){
-    //responsabilidad del llamador darme un source que sirva
-
     for (size_t i = 0; i < dest_size; ++i) {
         unsigned char encoded_codon = codon_encoder(src);
         dest[i] = encoded_codon;

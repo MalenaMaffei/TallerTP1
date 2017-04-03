@@ -31,15 +31,8 @@ size_t amino_counter_get_amino_count(amino_counter_t *self) {
     return self->amino_count;
 }
 
-void amino_counter_process(amino_counter_t *self, size_t *amino, size_t length){
-    for (int i = 0; i < length; ++i) {
-        ++self->amino_histogram[amino[i]];
-    }
-
+void sort_by_freq(amino_counter_t *self){
     size_t *histogram = self->amino_histogram;
-
-    self->amino_count = histogram[STOP_POS];
-
     size_t current, next;
     for (int j = 0; j < STOP_POS; ++j) {
         for (int i = 0; i < STOP_POS - 1; ++i) {
@@ -51,6 +44,15 @@ void amino_counter_process(amino_counter_t *self, size_t *amino, size_t length){
             }
         }
     }
+}
+
+void amino_counter_process(amino_counter_t *self, size_t *amino, size_t length){
+    for (int i = 0; i < length; ++i) {
+        ++self->amino_histogram[amino[i]];
+    }
+
+    self->amino_count = self->amino_histogram[STOP_POS];
+    sort_by_freq(self);
 }
 
 size_t amino_counter_get_freq(amino_counter_t *self, size_t amino_code){

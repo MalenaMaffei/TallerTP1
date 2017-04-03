@@ -23,11 +23,7 @@ int write_output(amino_counter_t* counter, char *output, size_t size){
     const char *aminos = "\n\nAminoácidos más frecuentes:\n";
 
     size_t amino_cnt = amino_counter_get_amino_count(counter);
-    written = snprintf(ptr, size - written, "%s%zu", prots,amino_cnt);
-    output_size += written;
-    ptr += written;
-
-    written =  snprintf(ptr, size - written, "%s", aminos);
+    written = snprintf(ptr, size - written, "%s%zu%s", prots,amino_cnt,aminos);
     output_size += written;
     ptr += written;
 
@@ -89,7 +85,7 @@ void server(const char *server_port){
 
 
 //    TODO HACER UN BUFFER DINAMICO ACA TAMBIEN
-    unsigned char buffer_leer[1024] = {0};
+    unsigned char buffer_leer[2024] = {0};
     unsigned char *buffer_ptr = buffer_leer;
     int bytes_read;
     int codons_received = 0;
@@ -99,7 +95,6 @@ void server(const char *server_port){
         codons_received += bytes_read;
     }
 
-// TODO con el tamanio de lo que se leyo malloc para pasarle al decoder.
 
     size_t decoded_aminos[1024];
 
@@ -117,7 +112,7 @@ void server(const char *server_port){
     int bytes_left, bytes_sent;
     for (bytes_left = output_size; bytes_left>0;) {
         if ((bytes_sent=send(new_fd, output_ptr, bytes_left, 0))<=0) {
-            exit(-1);
+            exit(0);
         } else {
             bytes_left-=bytes_sent;
             output_ptr+=bytes_sent;
@@ -128,6 +123,4 @@ void server(const char *server_port){
 
     close(new_fd);
     socket_destroy(&socket);
-
-    exit(0);
 }
