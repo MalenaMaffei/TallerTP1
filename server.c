@@ -4,28 +4,28 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
 #include "amino_counter.h"
 #include "decoder.h"
 #include "socket.h"
 #include "server.h"
-#include <unistd.h>
 
 #define BACKLOG 10
 #define BUFFSIZE 300
 
-int write_output(amino_counter_t* counter, char *output, size_t size){
-    char *ptr = output;
+int write_output(amino_counter_t* counter, unsigned char *output, size_t size){
+    unsigned char *ptr = output;
     int written = 0;
     int output_size = 0;
-
+    int write = 0;
     const char *prots = "Cantidad de proteínas encontradas: ";
     const char *aminos = "\n\nAminoácidos más frecuentes:\n";
 
     size_t amino_cnt = amino_counter_get_amino_count(counter);
-    written = snprintf(ptr, size - written, "%s%zu%s", prots,amino_cnt,aminos);
+
+    write = size - written;
+    written = snprintf((char*)ptr, write, "%s%zu%s", prots,amino_cnt,aminos);
     output_size += written;
     ptr += written;
 
@@ -36,7 +36,8 @@ int write_output(amino_counter_t* counter, char *output, size_t size){
         freq = amino_counter_get_freq(counter, amino);
         name = amino_name(amino);
         if (freq == 0){continue;}
-        written = snprintf(ptr, size - written, "%i) %s: %i\n", i, name, freq);
+        write = size - written;
+        written = snprintf((char*)ptr, write, "%i) %s: %i\n", i, name, freq);
         output_size += written;
         ptr += written;
     }
@@ -44,19 +45,12 @@ int write_output(amino_counter_t* counter, char *output, size_t size){
     return output_size;
 }
 
-
-//int main(int argc, char **argv){
-//    char *server_port = argv[1];
 void server(const char *server_port){
-    struct sockaddr_storage their_addr;
-    socklen_t addr_size;
+    struct sockaddr_storage c_addr;
     struct addrinfo hints;
     struct addrinfo *res;
-    int new_fd;
     int status;
     // !! don't forget your error checking for these calls !!
-
-    // first, load up address structs with getaddrinfo():
 
     memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_family = AF_INET;  // use IPv4 or IPv6, whichever
@@ -68,72 +62,36 @@ void server(const char *server_port){
         printf("Error in getaddrinfo: %s\n", gai_strerror(status));
         exit(0);
     }
-    // make a socket, bind it, and listen on it:
-
 
     socket_t socket;
     socket_create(&socket, res);
     socket_bind_and_listen(&socket, res, BACKLOG);
-    // sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-    // bind(sockfd, res->ai_addr, res->ai_addrlen);
-    // listen(sockfd, BACKLOG);
 
-    // now accept an incoming connection:
-
-    addr_size = sizeof their_addr;
-    new_fd = accept(socket.fD, (struct sockaddr *)&their_addr, &addr_size);
+    socklen_t addr_s = sizeof c_addr;
+    socket_t new_socket;
+    socket_accept(&socket, &new_socket, (struct sockaddr *)&c_addr, &addr_s);
     freeaddrinfo(res);
-    /*---- Send message to the socket of the incoming connection ----*/
 
 
-    unsigned char buffer_leer[2024] = {0};
-    unsigned char *buffer_ptr = buffer_leer;
-    size_t decoded_aminos[1024];
+    unsigned char buffer_leer[BUFFSIZE] = {0};
+    size_t decoded_aminos[BUFFSIZE];
     amino_counter_t counter;
-
-    int bytes_read;
-    int codons_received = 0;
-    while ((bytes_read = recv(new_fd, buffer_ptr, sizeof buffer_leer, 0))>0){
-        buffer_ptr+=bytes_read;
-        codons_received += bytes_read;
+    amino_counter_create(&counter);
+    int read = 1;
+    while (read>0){
+        read = socket_receive(&new_socket, buffer_leer,BUFFSIZE);
+        decode_buffer(buffer_leer, decoded_aminos, read);
+        amino_counter_process(&counter, decoded_aminos, read);
     }
 
-
-    decode_buffer(buffer_leer, decoded_aminos, codons_received);
-    amino_counter_create(&counter);
-    amino_counter_process(&counter, decoded_aminos, codons_received);
-
-//     int bytes_read;
-//     int codons_received = 0;
-//     while ((bytes_read = recv(new_fd, buffer_ptr, sizeof buffer_leer, 0))>0){
-// //        printf("se leyeron: %i\n", bytes_read);
-//         buffer_ptr+=bytes_read;
-//         codons_received += bytes_read;
-//     }
-//
-//
-//     decode_buffer(buffer_leer, decoded_aminos, codons_received);
-//     amino_counter_create(&counter);
-//     amino_counter_process(&counter, decoded_aminos, codons_received);
-
-
-    char output[1024];
+    unsigned char output[1024];
 
     int output_size = write_output(&counter, output, 1024);
 
-    char *output_ptr = output;
-    int bytes_left, bytes_sent;
-    for (bytes_left = output_size; bytes_left>0;) {
-        if ((bytes_sent=send(new_fd, output_ptr, bytes_left, 0))<=0) {
-            exit(0);
-        } else {
-            bytes_left-=bytes_sent;
-            output_ptr+=bytes_sent;
-        }
-    }
+    socket_send(&new_socket, output, output_size);
 
-    shutdown(new_fd, 1); //puede dar error
+    socket_shutdown(&new_socket, 1); //puede dar error
 
-    close(new_fd);
+    socket_destroy(&new_socket);
     socket_destroy(&socket);
 }

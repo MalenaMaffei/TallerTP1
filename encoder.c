@@ -1,5 +1,4 @@
 #include "encoder.h"
-#include <stdio.h>
 #include <stdlib.h>
 unsigned char codon_encoder(unsigned char *codon){
     unsigned char binary_codon = 0x00;

@@ -1,33 +1,9 @@
-//
-// Created by male on 29/03/17.
-//
-
 #include "decoder.h"
-#include <stdio.h>
-#include <stdlib.h>
 #define MASK 0xfc
-
+#define AMINO_Q 20
 enum Aminoacidos {
-    ASP,
-    GLU,
-    ALA,
-    ARG,
-    ASN,
-    CIS,
-    FEN,
-    GLI,
-    HIS,
-    ILE,
-    LEU,
-    LYS,
-    MET,
-    PRO,
-    SER,
-    TIR,
-    TRE,
-    TRP,
-    VAL,
-    STP
+    ASP, GLU, ALA, ARG, ASN, CIS, FEN, GLI, HIS, ILE, LEU, LYS, MET, PRO,
+    SER, TIR, TRE, TRP, VAL, STP
 };
 size_t genetic_code[4][4][4] = {
     {
@@ -44,7 +20,12 @@ size_t genetic_code[4][4][4] = {
     }
 };
 
-// size_t amino_histogram[20] = {0};
+const char *amino_names[20] = {
+    "Ácido aspártico", "Ácido glutámico",  "Alanina","Arginina", "Asparagina",
+    "Cisteína", "Fenilalanina", "Glicina", "Histidina", "Isoleucina", "Leucina",
+    "Lisina", "Metionina", "Prolina", "Serina", "Tirosina", "Treonina",
+    "Triptófano", "Valina", "Stop"
+};
 
 unsigned char base_code(unsigned char base){
     base |= MASK;
@@ -63,7 +44,6 @@ size_t get_amino(unsigned char codon){
     second_base >>= 2;
     second_base = base_code(second_base);
 
-
     first_base = codon;
     first_base >>= 4;
     first_base = base_code(first_base);
@@ -72,21 +52,16 @@ size_t get_amino(unsigned char codon){
 
     return amino;
 }
-const char *amino_names[20] = {
-    "Ácido aspártico", "Ácido glutámico",  "Alanina","Arginina", "Asparagina",
-    "Cisteína", "Fenilalanina", "Glicina", "Histidina", "Isoleucina", "Leucina",
-    "Lisina", "Metionina", "Prolina", "Serina", "Tirosina", "Treonina",
-    "Triptófano", "Valina", "Stop"
-};
 
 const char* amino_name(size_t amino_code){
+    if (amino_code > AMINO_Q - 1){ return NULL; }
     return amino_names[amino_code];
 }
 
-void decode_buffer(unsigned char *buffer, size_t *dest, size_t lenght){
+void decode_buffer(unsigned char *buffer, size_t *dest, size_t length){
     size_t amino;
     unsigned char codon;
-    for (int i = 0; i < lenght; ++i) {
+    for (int i = 0; i < length; ++i) {
         codon = buffer[i];
         amino = get_amino(codon);
         dest[i] = amino;

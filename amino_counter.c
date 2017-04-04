@@ -1,18 +1,10 @@
-//
-// Created by male on 31/03/17.
-//
 #include "amino_counter.h"
-#include <string.h>
-#include <stdio.h>
 
 #define AMINO_Q 20
 #define STOP_POS 19
 #define NO_AMINO -1
 
 void amino_counter_create(amino_counter_t *self) {
-    self->first = 0;
-    self->second = 0;
-    self->third = 0;
     self->amino_count = 0;
     for (int i = 0; i < AMINO_Q; ++i) self->amino_histogram[i] = 0;
     for (int j = 0; j < STOP_POS; ++j) self->ordered_aminos[j] = j;
@@ -23,6 +15,7 @@ void amino_counter_destroy(amino_counter_t *self){
 }
 
 int amino_counter_get_rank(amino_counter_t *self, int rank) {
+    if (rank > AMINO_Q){return -1;}
     return self->ordered_aminos[rank - 1];
 }
 
@@ -32,6 +25,7 @@ size_t amino_counter_get_amino_count(amino_counter_t *self) {
 }
 
 void sort_by_freq(amino_counter_t *self){
+    for (int j = 0; j < STOP_POS; ++j) self->ordered_aminos[j] = j;
     size_t *histogram = self->amino_histogram;
     size_t current, next;
     for (int j = 0; j < STOP_POS; ++j) {
@@ -56,5 +50,6 @@ void amino_counter_process(amino_counter_t *self, size_t *amino, size_t length){
 }
 
 size_t amino_counter_get_freq(amino_counter_t *self, size_t amino_code){
+    if (amino_code > AMINO_Q - 1){return -1;}
     return self->amino_histogram[amino_code];
 }

@@ -1,8 +1,3 @@
-//
-// Created by male on 25/03/17.
-//
-
-/****************** CLIENT CODE ****************/
 #define _POSIX_C_SOURCE 200112L
 
 #include <string.h>
@@ -89,7 +84,11 @@ void client(const char *ip, const char *port, const char *file){
     if (status < 0) { exit(0); }
 
     unsigned char buffer_leer[1024] = {0};
-    socket_receive(&client_socket, buffer_leer);
+    int read = 1;
+    while (read >0){
+       read = socket_receive(&client_socket, buffer_leer, sizeof(buffer_leer));
+    }
+
 
     printf("%s", buffer_leer);
 
