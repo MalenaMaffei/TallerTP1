@@ -1,30 +1,39 @@
 #include "encoder.h"
 #include <stdlib.h>
+
+unsigned char base_encoder(unsigned char base, int shift){
+//  al caracter pasado se le resta el numero correspondiente
+//  y luego un shift para dejarlo en la posicion correspondiente
+//  dentro del byte que sera el codon codificado.
+    switch (base) {
+        case 'A':
+            base -= 0x41;
+            break;
+        case 'U':
+            base -= 0x54;
+            break;
+        case 'G':
+            base -= 0x45;
+            break;
+        case 'C':
+            base -= 0x40;
+            break;
+        default:
+            exit(0);
+    }
+    base <<= shift;
+    return base;
+}
+
 unsigned char codon_encoder(unsigned char *codon){
+//Se hacen ors de cada base codificada para dejarlas
+// a todas en un mismo byte binary_codon
     unsigned char binary_codon = 0x00;
     size_t shift = 4;
     for (int i = 0; i < 3; ++i) {
-        unsigned char current = codon[i];
-        switch (current) {
-            case 'A':
-                current -= 0x41;
-                break;
-            case 'U':
-                current -= 0x54;
-                break;
-            case 'G':
-                current -= 0x45;
-                break;
-            case 'C':
-                current -= 0x40;
-                break;
-            default:
-                exit(0);
-        }
-
-        current <<= shift;
+        unsigned char current;;
+        current = base_encoder(codon[i], shift);
         shift -= 2;
-
         binary_codon |= current;
     }
     return binary_codon;

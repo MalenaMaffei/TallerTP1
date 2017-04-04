@@ -1,7 +1,7 @@
 #ifndef __AMINO_COUNTER_H__
 #define __AMINO_COUNTER_H__
 
-#include <stdio.h>
+#include <stdlib.h>
 #define AMINO_Q 20
 #define STOP_POS 19
 

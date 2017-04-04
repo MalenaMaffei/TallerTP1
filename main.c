@@ -1,8 +1,8 @@
-#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include "server.h"
 #include "client.h"
+
 int main(int argc, char **argv) {
     if (argc < 2){ exit(0);}
     const char *mode = argv[1];

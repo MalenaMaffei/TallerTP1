@@ -5,7 +5,7 @@ enum Aminoacidos {
     ASP, GLU, ALA, ARG, ASN, CIS, FEN, GLI, HIS, ILE, LEU, LYS, MET, PRO,
     SER, TIR, TRE, TRP, VAL, STP
 };
-size_t genetic_code[4][4][4] = {
+static const size_t genetic_code[4][4][4] = {
     {
     {LYS,ASN,LYS,ASN}, {ILE,ILE,MET,ILE}, {ARG,SER,ARG,SER}, {TRE,TRE,TRE,TRE}
     },
@@ -20,7 +20,7 @@ size_t genetic_code[4][4][4] = {
     }
 };
 
-const char *amino_names[20] = {
+static const char *amino_names[20] = {
     "Ácido aspártico", "Ácido glutámico",  "Alanina","Arginina", "Asparagina",
     "Cisteína", "Fenilalanina", "Glicina", "Histidina", "Isoleucina", "Leucina",
     "Lisina", "Metionina", "Prolina", "Serina", "Tirosina", "Treonina",
