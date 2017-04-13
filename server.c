@@ -22,7 +22,7 @@ int str_out(amino_counter_t* ctr, decoder_t* dec, unsigned char *out, size_t s){
 
     size_t amino_cnt = amino_counter_get_amino_count(ctr);
 
-    write = s - written;
+    write = s;
     written = snprintf((char*)ptr, write, "%s%zu%s", prots,amino_cnt,aminos);
     output_size += written;
     ptr += written;
@@ -33,7 +33,7 @@ int str_out(amino_counter_t* ctr, decoder_t* dec, unsigned char *out, size_t s){
         amino = amino_counter_get_rank(ctr, i);
         freq = amino_counter_get_freq(ctr, amino);
         name = amino_name(dec, amino);
-        if (freq == 0){continue;}
+        if (freq == 0){break;}
         write = s - written;
         written = snprintf((char*)ptr, write, "%i) %s: %i\n", i, name, freq);
         output_size += written;
@@ -97,7 +97,4 @@ void server(const char *server_port){
 
     socket_destroy(&new_socket);
     socket_destroy(&socket);
-    decoder_destroy(&decoder);
-    amino_counter_destroy(&counter);
 }
-

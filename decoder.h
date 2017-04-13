@@ -22,6 +22,4 @@ void decode(decoder_t* self, unsigned char *buf, size_t *dest, size_t length);
 // self fue inicializado con decoder_create
 char* amino_name(decoder_t* self, size_t amino_code);
 
-void decoder_destroy(decoder_t* self);
 #endif //__DECODER_H__
-

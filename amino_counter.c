@@ -10,10 +10,6 @@ void amino_counter_create(amino_counter_t *self) {
     for (int j = 0; j < STOP_POS; ++j) self->ordered_aminos[j] = j;
 }
 
-void amino_counter_destroy(amino_counter_t *self){
-    //nothing to do here
-}
-
 int amino_counter_get_rank(amino_counter_t *self, int rank) {
     if (rank > AMINO_Q){return -1;}
     return self->ordered_aminos[rank - 1];

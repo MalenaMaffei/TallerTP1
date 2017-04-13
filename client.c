@@ -33,7 +33,7 @@ void send_codons(const char *file, socket_t* socket ){
 
     while (file_size > 0){
         size_t block;
-        if (file_size < 300){
+        if (file_size < R_BUFFSIZE){
             block = file_size;
         } else {
             block = R_BUFFSIZE;
@@ -58,7 +58,7 @@ void recv_and_print(socket_t* socket){
     printf("%s", buffer_leer);
 }
 
-void client(const char *ip, const char *port, const char *file){
+int client(const char *ip, const char *port, const char *file){
     int status;
     struct addrinfo hints;
     struct addrinfo *res;
@@ -69,20 +69,21 @@ void client(const char *ip, const char *port, const char *file){
     hints.ai_flags = 0;
 
     status = getaddrinfo(ip, port, &hints, &res);
-    if (status < 0) { exit(0); }
+    if (status < 0) { return 0; }
 
     socket_t client_socket;
     status = socket_create_and_connect(&client_socket, res);
-    if (status < 0) { exit(0); }
+    if (status < 0) { return 0; }
 
     freeaddrinfo(res);
 
     send_codons(file, &client_socket);
 
     status = socket_shutdown(&client_socket, 1);
-    if (status < 0) { exit(0); }
+    if (status < 0) { return 0; }
 
     recv_and_print(&client_socket);
 
     socket_destroy(&client_socket);
+    return 0;
 }

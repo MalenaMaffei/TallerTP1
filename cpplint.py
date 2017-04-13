@@ -620,10 +620,15 @@ class _CppLintState(object):
 
   def PrintErrorCounts(self):
     """Print a summary of errors by category, and the total."""
+    OKGREEN = '\x1b[6;30;42m'
+    FAILRED = '\x1b[6;30;41m'
+    FIN = '\x1b[0m'
     for category, count in self.errors_by_category.iteritems():
       sys.stderr.write('Category \'%s\' errors found: %d\n' %
                        (category, count))
-    sys.stderr.write('Total errors found: %d\n' % self.error_count)
+    COLOR = OKGREEN
+    if self.error_count>0: COLOR = FAILRED
+    sys.stderr.write('%sTotal errors found: %d%s\n' % (COLOR, self.error_count, FIN))
 
 _cpplint_state = _CppLintState()
 
@@ -3921,7 +3926,7 @@ def ProcessFile(filename, vlevel, extra_check_functions=[]):
             'One or more unexpected \\r (^M) found;'
             'better to use only a \\n')
 
-  sys.stderr.write('Done processing %s\n' % filename)
+  sys.stderr.write('Done processing %s\n\n\n' % filename)
 
 
 def PrintUsage(message):

@@ -34,8 +34,4 @@ size_t amino_counter_get_amino_count(amino_counter_t *self);
 // Pre: self fue inicializado mediante create.
 size_t amino_counter_get_freq(amino_counter_t *self, size_t amino_code);
 
-// Destruye la instancia self liberando sus recursos.
-// Pre: self fue inicializado mediante wordscounter_create
-void amino_counter_destroy(amino_counter_t *self);
 #endif //__AMINO_COUNTER_H__
-

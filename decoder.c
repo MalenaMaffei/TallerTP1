@@ -79,7 +79,3 @@ void decode(decoder_t* self, unsigned char *buf, size_t *dest, size_t length){
         dest[i] = amino;
     }
 }
-
-void decoder_destroy(decoder_t* self){
-//    nothig to do here
-}
