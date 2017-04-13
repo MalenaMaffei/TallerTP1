@@ -34,7 +34,7 @@ void decoder_create(decoder_t* self){
     }
 }
 
-unsigned char base_code(unsigned char base){
+unsigned char static base_code(unsigned char base){
 // Con las mascara se pone en 0 a los primeros
 //  6 bits del byte
     base |= MASK;
@@ -42,7 +42,7 @@ unsigned char base_code(unsigned char base){
     return base;
 }
 
-size_t get_amino(decoder_t* self, unsigned char codon){
+size_t static get_amino(decoder_t* self, unsigned char codon){
 //  se shiftea al codon para cada vez dejar en
 //  los ultimos dos bits del byte a la base con la
 //  que se va a trabajar

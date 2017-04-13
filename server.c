@@ -11,7 +11,7 @@
 #define BUFFSIZE 300
 #define OUTPUTMAX 200
 
-int str_out(amino_counter_t* ctr, decoder_t* dec, unsigned char *out, size_t s){
+int static str_out(amino_counter_t* ctr,decoder_t* dec,unsigned char *out,size_t s){
 //    Escribe el output en el array output de tamaño size.
     unsigned char *ptr = out;
     int written = 0;
@@ -43,7 +43,7 @@ int str_out(amino_counter_t* ctr, decoder_t* dec, unsigned char *out, size_t s){
     return output_size;
 }
 
-void recv_aminos(amino_counter_t *ctr, decoder_t *decoder,socket_t* socket){
+void static recv_aminos(amino_counter_t *ctr, decoder_t *dcdr,socket_t* socket){
 //    PRE: el counter ya fue creado.
 //    el socket esta listo para recibir.
     unsigned char buffer_leer[BUFFSIZE] = {0};
@@ -51,12 +51,12 @@ void recv_aminos(amino_counter_t *ctr, decoder_t *decoder,socket_t* socket){
     int read = 1;
     while (read>0){
         read = socket_receive(socket, buffer_leer,BUFFSIZE);
-        decode(decoder, buffer_leer, decoded_aminos, read);
+        decode(dcdr, buffer_leer, decoded_aminos, read);
         amino_counter_process(ctr, decoded_aminos, read);
     }
 }
 
-void server(const char *server_port){
+int server(const char *server_port){
     struct sockaddr_storage c_addr;
     struct addrinfo hints;
     struct addrinfo *res;
@@ -69,7 +69,7 @@ void server(const char *server_port){
 
     status = getaddrinfo(0, server_port, &hints, &res);
     if (status != 0) {
-        exit(0);
+        return 0;
     }
 
     socket_t socket;
@@ -97,4 +97,6 @@ void server(const char *server_port){
 
     socket_destroy(&new_socket);
     socket_destroy(&socket);
+
+    return 0;
 }

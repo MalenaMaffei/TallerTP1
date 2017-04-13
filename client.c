@@ -11,19 +11,19 @@
 #define E_BUFFSIZE 100
 #define OUTPUTMAX 200
 
-long get_file_size(FILE* fp){
+long static get_file_size(FILE* fp){
     long file_size = 0;
     if (fp != NULL) {
         if (fseek(fp, 0L, SEEK_END) == 0) {
             file_size = ftell(fp);
-            if (file_size == -1) { exit(0); }
-            if (fseek(fp, 0L, SEEK_SET) != 0) { exit(0); }
+            if (file_size == -1) { return 0; }
+            if (fseek(fp, 0L, SEEK_SET) != 0) { return 0; }
         }
     }
     return file_size;
 }
 
-void send_codons(const char *file, socket_t* socket ){
+int static send_codons(const char *file, socket_t* socket ){
 //  PRE: el socket fue creado y esta listo para mandar
     unsigned char source[R_BUFFSIZE];
     unsigned char encoded_codons[E_BUFFSIZE];
@@ -38,17 +38,18 @@ void send_codons(const char *file, socket_t* socket ){
         } else {
             block = R_BUFFSIZE;
         }
-        if (fread(source, sizeof(char), block, fp) != block){exit(0);}
-        if (ferror(fp) != 0) {exit(0);}
+        if (fread(source, sizeof(char), block, fp) != block){return 0;}
+        if (ferror(fp) != 0) { return 0; }
         size_t codons_size = block/3;
         encode_str(source, encoded_codons, codons_size);
         socket_send(socket, encoded_codons, codons_size);
         file_size -= block;
     }
     fclose(fp);
+    return 0;
 }
 
-void recv_and_print(socket_t* socket){
+void static recv_and_print(socket_t* socket){
 //  PRE: el socket fue creado y esta listo para recibir.
     unsigned char buffer_leer[OUTPUTMAX] = {0};
     int read = 1;

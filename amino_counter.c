@@ -20,7 +20,7 @@ size_t amino_counter_get_amino_count(amino_counter_t *self) {
     return self->amino_count;
 }
 
-void sort_by_freq(amino_counter_t *self){
+void static sort_by_freq(amino_counter_t *self){
 //    busca el mayor en base a amino_histogram pero se usa
 //    el indice para dejarlo ordenado por frec en ordered_aminos
     for (int j = 0; j < STOP_POS; ++j) self->ordered_aminos[j] = j;

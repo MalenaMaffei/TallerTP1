@@ -1,7 +1,7 @@
 #include "encoder.h"
 #include <stdlib.h>
 
-unsigned char base_encoder(unsigned char base, int shift){
+unsigned char static base_encoder(unsigned char base, int shift){
 //  al caracter pasado se le resta el numero correspondiente
 //  y luego un shift para dejarlo en la posicion correspondiente
 //  dentro del byte que sera el codon codificado.
@@ -19,13 +19,13 @@ unsigned char base_encoder(unsigned char base, int shift){
             base -= 0x40;
             break;
         default:
-            exit(0);
+            return 0;
     }
     base <<= shift;
     return base;
 }
 
-unsigned char codon_encoder(unsigned char *codon){
+unsigned char static codon_encoder(unsigned char *codon){
 //Se hacen ors de cada base codificada para dejarlas
 // a todas en un mismo byte binary_codon
     unsigned char binary_codon = 0x00;
