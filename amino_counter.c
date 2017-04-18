@@ -4,6 +4,7 @@
 #define STOP_POS 19
 #define NO_AMINO -1
 
+
 void amino_counter_create(amino_counter_t *self) {
     self->amino_count = 0;
     for (int i = 0; i < AMINO_Q; ++i) self->amino_histogram[i] = 0;
@@ -11,7 +12,7 @@ void amino_counter_create(amino_counter_t *self) {
 }
 
 int amino_counter_get_rank(amino_counter_t *self, int rank) {
-    if (rank > AMINO_Q){return -1;}
+    if (rank > AMINO_Q){return NO_AMINO;}
     return self->ordered_aminos[rank - 1];
 }
 
@@ -48,6 +49,6 @@ void amino_counter_process(amino_counter_t *self, size_t *amino, size_t length){
 }
 
 size_t amino_counter_get_freq(amino_counter_t *self, size_t amino_code){
-    if (amino_code > AMINO_Q - 1){return -1;}
+    if (amino_code > AMINO_Q - 1){return NO_AMINO;}
     return self->amino_histogram[amino_code];
 }

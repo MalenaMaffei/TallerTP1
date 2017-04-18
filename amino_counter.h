@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #define AMINO_Q 20
 #define STOP_POS 19
+#define NO_AMINO -1
 
 //Tipo amino_counter_t, calcula las frecuencias de los aminoácidos
 //y los ordena en base a ella.
@@ -22,7 +23,7 @@ void amino_counter_create(amino_counter_t *self);
 // Amino es un array de aminoácidos validos y length es <= a su tamaño.
 void amino_counter_process(amino_counter_t *self, size_t *amino, size_t length);
 
-// Devuelve el aminoácido con el rango dado o -1 si no existe.
+// Devuelve el aminoácido con el rango dado o NO_AMINO si no existe.
 // Pre: self fue inicializado mediante create y se han procesado aminoacidos.
 int amino_counter_get_rank(amino_counter_t *self, int rank);
 
@@ -30,7 +31,7 @@ int amino_counter_get_rank(amino_counter_t *self, int rank);
 // Pre: self fue inicializado mediante create.
 size_t amino_counter_get_amino_count(amino_counter_t *self);
 
-// Devuelve la frecuencia del aminoácido dado y -1 si no existe.
+// Devuelve la frecuencia del aminoácido dado y NO_AMINO si no existe.
 // Pre: self fue inicializado mediante create.
 size_t amino_counter_get_freq(amino_counter_t *self, size_t amino_code);
 

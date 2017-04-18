@@ -10,8 +10,10 @@
 #define BACKLOG 10
 #define BUFFSIZE 300
 #define OUTPUTMAX 200
+#define READ_SHTDWN 1
 
-int static str_out(amino_counter_t* ctr,decoder_t* dec,unsigned char *out,size_t s){
+int static str_out(amino_counter_t* ctr,decoder_t* dec,
+                   unsigned char *out,size_t s){
 //    Escribe el output en el array output de tamaño size.
     unsigned char *ptr = out;
     int written = 0;
@@ -93,7 +95,7 @@ int server(const char *server_port){
 
     socket_send(&new_socket, output, output_size);
 
-    socket_shutdown(&new_socket, 1);
+    socket_shutdown(&new_socket, READ_SHTDWN);
 
     socket_destroy(&new_socket);
     socket_destroy(&socket);

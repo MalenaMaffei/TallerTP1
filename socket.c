@@ -7,6 +7,8 @@
 #include <unistd.h>
 
 #include "socket.h"
+#define OK 0
+#define NOK -1
 
 int socket_create(socket_t* self, struct addrinfo* ptr){
     int skt = 0;
@@ -27,20 +29,20 @@ int socket_create_and_connect(socket_t* self, struct addrinfo* addr){
 
     for (ptr = addr; ptr != NULL && connected == false; ptr = ptr->ai_next) {
         skt = socket_create(self, ptr);
-        if (skt == -1) {
-            return -1;
+        if (skt == NOK) {
+            return NOK;
         } else {
             status = socket_connect(self, ptr->ai_addr, ptr->ai_addrlen);
-            if (status == -1) {
+            if (status == NOK) {
                 close(skt);
-                return -1;
+                return NOK;
             }
-            connected = (status != -1);
+            connected = (status != NOK);
         }
     }
 
     self->fD = skt;
-    return 0;
+    return OK;
 }
 
 int socket_send(socket_t* self, unsigned char *source, size_t length){
@@ -48,31 +50,31 @@ int socket_send(socket_t* self, unsigned char *source, size_t length){
     unsigned char *buffer_ptr = source;
     for (bytes_left = length; bytes_left>0;) {
         if ((bytes_sent=send(self->fD, buffer_ptr, bytes_left, 0))<=0) {
-            return -1;
+            return NOK;
         } else {
             bytes_left-=bytes_sent;
             buffer_ptr+=bytes_sent;
         }
     }
-    return 0;
+    return OK;
 }
 
 int socket_bind_and_listen(socket_t* self, struct addrinfo* addr, int backlog){
     int s_bind = bind(self->fD, addr->ai_addr, addr->ai_addrlen);
     int s_lis = listen(self->fD, backlog);
-    if (s_bind < 0 || s_lis <0){return -1;}
-    return 0;
+    if (s_bind < 0 || s_lis <0){return NOK;}
+    return OK;
 }
 
  int socket_accept(socket_t* self,socket_t* n,struct sockaddr *a,socklen_t *l){
      int new_fd = accept(self->fD, a, l);
      n->fD = new_fd;
-     if (new_fd < 0){ return -1; }
-     return 0;
+     if (new_fd < 0){ return NOK; }
+     return OK;
  }
 
 int socket_receive(socket_t* self, unsigned char *buffer, size_t length){
-    int bytes_read = recv(self->fD, buffer, length, 0);
+    int bytes_read = recv(self->fD, buffer, length, MSG_NOSIGNAL);
     return bytes_read;
 }
 
