@@ -11,6 +11,7 @@
 #define BUFFSIZE 300
 #define OUTPUTMAX 200
 #define READ_SHTDWN 1
+#define SERVER_MODE 0
 
 int static str_out(amino_counter_t* ctr,decoder_t* dec,
                    unsigned char *out,size_t s){
@@ -59,29 +60,13 @@ void static recv_aminos(amino_counter_t *ctr, decoder_t *dcdr,socket_t* socket){
 }
 
 int server(const char *server_port){
-    struct sockaddr_storage c_addr;
-    struct addrinfo hints;
-    struct addrinfo *res;
-    int status;
-
-    memset(&hints, 0, sizeof(struct addrinfo));
-    hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_flags = AI_PASSIVE;
-
-    status = getaddrinfo(0, server_port, &hints, &res);
-    if (status != 0) {
-        return 0;
-    }
-
     socket_t socket;
-    socket_create(&socket, res);
-    socket_bind_and_listen(&socket, res, BACKLOG);
+    socket_create(&socket, 0, server_port, SERVER_MODE);
 
-    socklen_t addr_s = sizeof c_addr;
+    socket_bind_and_listen(&socket, BACKLOG);
+
     socket_t new_socket;
-    socket_accept(&socket, &new_socket, (struct sockaddr *)&c_addr, &addr_s);
-    freeaddrinfo(res);
+    socket_accept(&socket, &new_socket);
 
     decoder_t decoder;
     decoder_create(&decoder);
@@ -97,7 +82,7 @@ int server(const char *server_port){
 
     socket_shutdown(&new_socket, READ_SHTDWN);
 
-    socket_destroy(&new_socket);
+    socket_accept_destroy(&new_socket);
     socket_destroy(&socket);
 
     return 0;

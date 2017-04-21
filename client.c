@@ -10,7 +10,7 @@
 #define R_BUFFSIZE 300
 #define E_BUFFSIZE 100
 #define OUTPUTMAX 200
-
+#define CLIENT_MODE 1
 long static get_file_size(FILE* fp){
     long file_size = 0;
     if (fp != NULL) {
@@ -28,7 +28,7 @@ int static send_codons(const char *file, socket_t* socket ){
     unsigned char source[R_BUFFSIZE];
     unsigned char encoded_codons[E_BUFFSIZE];
 
-    FILE *fp = fopen(file, "r");
+    FILE *fp = fopen(file, "rb");
     long file_size = get_file_size(fp);
 
     while (file_size > 0){
@@ -61,22 +61,10 @@ void static recv_and_print(socket_t* socket){
 
 int client(const char *ip, const char *port, const char *file){
     int status;
-    struct addrinfo hints;
-    struct addrinfo *res;
-
-    memset(&hints, 0, sizeof hints);
-    hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_flags = 0;
-
-    status = getaddrinfo(ip, port, &hints, &res);
-    if (status < 0) { return 0; }
 
     socket_t client_socket;
-    status = socket_create_and_connect(&client_socket, res);
+    status = socket_create_and_connect(&client_socket, ip, port);
     if (status < 0) { return 0; }
-
-    freeaddrinfo(res);
 
     send_codons(file, &client_socket);
 
